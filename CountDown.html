@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Timer</title>
+    <style>
+        /* --- 1. CSS STYLING --- */
+        
+        /* You can change these variables to match your site's colors */
+        :root {
+            --bg-color: #f0f4f8;
+            --text-color: #333;
+            --timer-bg: #ffffff;
+            --timer-text: #0a4d8d;
+            --label-text: #777;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        #countdown-container {
+            text-align: center;
+        }
+
+        #countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 16px; /* Space between blocks */
+            margin-top: 20px;
+        }
+
+        .time-block {
+            background-color: var(--timer-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            min-width: 80px; /* Ensures all blocks have same width */
+        }
+
+        .time-block span {
+            display: block;
+            font-size: 3rem; /* 48px */
+            font-weight: 700;
+            color: var(--timer-text);
+            line-height: 1.1;
+        }
+
+        .time-block .label {
+            font-size: 0.9rem; /* 14px */
+            color: var(--label-text);
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+
+        #message {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--timer-text);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="countdown-container">
+        <h2>Event Starts In:</h2>
+        <div id="countdown-timer">
+            <div class="time-block">
+                <span id="days">00</span>
+                <div class="label">Days</div>
+            </div>
+            <div class="time-block">
+                <span id="hours">00</span>
+                <div class="label">Hours</div>
+            </div>
+            <div class="time-block">
+                <span id="minutes">00</span>
+                <div class="label">Minutes</div>
+            </div>
+            <div class="time-block">
+                <span id="seconds">00</span>
+                <div class="label">Seconds</div>
+            </div>
+        </div>
+        <div id="message" style="display:none;">
+            The Event Has Started!
+        </div>
+    </div>
+
+    <script>
+        // --- !!! CHANGE THIS DATE !!! ---
+        // Set the date you're counting down to
+        // Format: "Month Day, Year HH:MM:SS" (e.g., "Jan 1, 2026 00:00:00")
+        const targetDate = new Date("Jan 1, 2026 00:00:00").getTime();
+        
+        // Get references to the HTML elements
+        const daysEl = document.getElementById("days");
+        const hoursEl = document.getElementById("hours");
+        const minutesEl = document.getElementById("minutes");
+        const secondsEl = document.getElementById("seconds");
+        const timerEl = document.getElementById("countdown-timer");
+        const messageEl = document.getElementById("message");
+
+        // Update the countdown every 1 second
+        const interval = setInterval(() => {
+            // Get today's date and time
+            const now = new Date().getTime();
+            
+            // Find the distance between now and the target date
+            const distance = targetDate - now;
+            
+            // Time calculations for days, hours, minutes, and seconds
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            // Display the result in the elements
+            // .padStart(2, '0') ensures the number is always two digits (e.g., 09 instead of 9)
+            daysEl.innerHTML = String(days).padStart(2, '0');
+            hoursEl.innerHTML = String(hours).padStart(2, '0');
+            minutesEl.innerHTML = String(minutes).padStart(2, '0');
+            secondsEl.innerHTML = String(seconds).padStart(2, '0');
+            
+            // If the countdown is finished, stop the interval and show the message
+            if (distance < 0) {
+                clearInterval(interval);
+                timerEl.style.display = "none"; // Hide the timer
+                messageEl.style.display = "block"; // Show the "expired" message
+            }
+        }, 1000); // 1000ms = 1 second
+    </script>
+
+</body>
+</html>
