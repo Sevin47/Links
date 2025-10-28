@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Countdown Timer</title>
     <style>
-        /* --- 1. CSS STYLING --- */
+        /* --- 1. CSS STYLING (Unchanged) --- */
         
-        /* You can change these variables to match your site's colors */
         :root {
             --bg-color: #f0f4f8;
             --text-color: #333;
@@ -36,7 +35,7 @@
         #countdown-timer {
             display: flex;
             justify-content: center;
-            gap: 16px; /* Space between blocks */
+            gap: 16px;
             margin-top: 20px;
         }
 
@@ -45,19 +44,19 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: var(--shadow);
-            min-width: 80px; /* Ensures all blocks have same width */
+            min-width: 80px;
         }
 
         .time-block span {
             display: block;
-            font-size: 3rem; /* 48px */
+            font-size: 3rem;
             font-weight: 700;
             color: var(--timer-text);
             line-height: 1.1;
         }
 
         .time-block .label {
-            font-size: 0.9rem; /* 14px */
+            font-size: 0.9rem;
             color: var(--label-text);
             margin-top: 5px;
             text-transform: uppercase;
@@ -73,7 +72,8 @@
 <body>
 
     <div id="countdown-container">
-        <h2>Event Starts In:</h2>
+        <h2 id="countdown-title">Event Starts In:</h2>
+        
         <div id="countdown-timer">
             <div class="time-block">
                 <span id="days">00</span>
@@ -98,10 +98,16 @@
     </div>
 
     <script>
-        // --- !!! CHANGE THIS DATE !!! ---
-        // Set the date you're counting down to
-        // Format: "Month Day, Year HH:MM:SS" (e.g., "Jan 1, 2026 00:00:00")
-        const targetDate = new Date("Jan 1, 2026 00:00:00").getTime();
+        // --- !!! TARGET DATES !!! ---
+        // Using ISO 8601 format with the UTC offset for US Eastern Time (EDT is -04:00)
+        // This ensures the time is correct regardless of the server's or user's timezone.
+        
+        // Target 1: 12:00 am US Eastern on October 29, 2025
+        const targetDate1 = new Date("2025-10-28T13:00:00-04:00").getTime();
+        
+        // Target 2: 12:00 am US Eastern on October 28, 2026
+        const targetDate2 = new Date("2026-10-28T00:00:00-04:00").getTime();
+        
         
         // Get references to the HTML elements
         const daysEl = document.getElementById("days");
@@ -110,34 +116,50 @@
         const secondsEl = document.getElementById("seconds");
         const timerEl = document.getElementById("countdown-timer");
         const messageEl = document.getElementById("message");
+        
+        // *** NEW: Get reference to the title element ***
+        const titleEl = document.getElementById("countdown-title");
 
         // Update the countdown every 1 second
         const interval = setInterval(() => {
             // Get today's date and time
             const now = new Date().getTime();
             
-            // Find the distance between now and the target date
-            const distance = targetDate - now;
+            let currentTargetDate;
             
-            // Time calculations for days, hours, minutes, and seconds
+            // *** NEW: Logic to pick the correct target date ***
+            if (now < targetDate1) {
+                // We are counting down to the first event
+                currentTargetDate = targetDate1;
+                titleEl.innerHTML = "Event Starts In:";
+            } else if (now < targetDate2) {
+                // First event passed, now counting down to the second event
+                currentTargetDate = targetDate2;
+                titleEl.innerHTML = "Next Event In:"; // Title updates
+            } else {
+                // Both events have passed
+                clearInterval(interval);
+                timerEl.style.display = "none"; // Hide the timer
+                titleEl.style.display = "none"; // Hide the title
+                messageEl.style.display = "block"; // Show the "expired" message
+                return; // Stop the function
+            }
+            
+            // Find the distance between now and the *current* target date
+            const distance = currentTargetDate - now;
+            
+            // Time calculations (unchanged)
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
             
-            // Display the result in the elements
-            // .padStart(2, '0') ensures the number is always two digits (e.g., 09 instead of 9)
+            // Display the result in the elements (unchanged)
             daysEl.innerHTML = String(days).padStart(2, '0');
             hoursEl.innerHTML = String(hours).padStart(2, '0');
             minutesEl.innerHTML = String(minutes).padStart(2, '0');
             secondsEl.innerHTML = String(seconds).padStart(2, '0');
             
-            // If the countdown is finished, stop the interval and show the message
-            if (distance < 0) {
-                clearInterval(interval);
-                timerEl.style.display = "none"; // Hide the timer
-                messageEl.style.display = "block"; // Show the "expired" message
-            }
         }, 1000); // 1000ms = 1 second
     </script>
 
